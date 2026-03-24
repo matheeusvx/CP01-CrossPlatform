@@ -191,7 +191,7 @@ ou
 Clone o repositório:
 
 ```bash
-git clone https://github.com/SEU-USUARIO/fiap-cpad-cp1-challenge-hub.git
+git clone https://github.com/matheeusvx/CP01-CrossPlatform.git
 ```
 
 Acesse a pasta do projeto:
