@@ -7,7 +7,7 @@ import {
   TextInput,
   TouchableOpacity,
 } from 'react-native';
-import Header from './components/Header';
+import Header from '../components/Header';
 
 export default function EmpresaScreen() {
   const [assunto, setAssunto] = useState('');
