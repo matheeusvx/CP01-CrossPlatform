@@ -1,0 +1,15 @@
+{
+  "expo": {
+    "name": "Challenge Hub FIAP",
+    "slug": "challenge-hub-fiap",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "android": {
+      "package": "com.matheus.challengehubfiap"
+    },
+    "plugins": [
+      "expo-asset",
+      "expo-router"
+    ]
+  }
+}
