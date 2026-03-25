@@ -225,19 +225,19 @@ Depois disso, basta abrir no **Expo Go** ou rodar no **emulador Android**.
 ### Prints das Telas
 
 #### Home
-![Home](./assets/1.png)
+<img src="./assets/1.png" alt="Home" width="250" />
 
 #### Portal de Avisos
-![Avisos](./assets/2.png)
+<img src="./assets/2.png" alt="Avisos" width="250" />
 
 #### Contato com a Empresa
-![Empresa](./assets/3.png)
+<img src="./assets/3.png" alt="Empresa" width="250" />
 
 #### Comunidade
-![Comunidade](./assets/4.png)
+<img src="./assets/4.png" alt="Comunidade" width="250" />
 
 #### Calendário
-![Calendário](./assets/5.png)
+<img src="./assets/5.png" alt="Calendário" width="250" />
 
 ---
 
