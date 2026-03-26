@@ -1,14 +1,10 @@
-import { ScrollView, View, Text, StyleSheet, Image } from 'react-native';
+import { ScrollView, View, Text, StyleSheet } from 'react-native'; 
 import Header from '../components/Header';
 import MenuCard from '../components/MenuCard';
 
 export default function HomeScreen() {
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <Image
-        source={require('../assets/icon.png')}
-        style={styles.logo}
-      />
 
       <Header
         title="Challenge Hub FIAP"
