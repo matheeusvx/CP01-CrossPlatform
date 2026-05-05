@@ -1,22 +1,26 @@
-const avisos = [
+export const INITIAL_AVISOS = [
   {
-    id: 1,
-    titulo: 'Entrega da Sprint 1',
-    descricao: 'A primeira sprint deve ser enviada até sexta-feira, às 23h59.',
-    data: '24/03/2026',
+    id: 'aviso-1',
+    title: 'Checkpoint 2 disponível',
+    category: 'Avaliação',
+    description:
+      'O CP2 exige autenticação, persistência local, Context API, validações e diferencial técnico documentado.',
+    date: '2026-03-10',
   },
   {
-    id: 2,
-    titulo: 'Reunião com a empresa parceira',
-    descricao: 'A apresentação inicial com a empresa acontecerá no auditório principal.',
-    data: '26/03/2026',
+    id: 'aviso-2',
+    title: 'README completo é obrigatório',
+    category: 'Documentação',
+    description:
+      'O README deve conter descrição do projeto, integrantes, como rodar, decisões técnicas, prints e demonstração.',
+    date: '2026-03-12',
   },
   {
-    id: 3,
-    titulo: 'Template do pitch atualizado',
-    descricao: 'O novo modelo de apresentação já está disponível para os grupos.',
-    data: '28/03/2026',
+    id: 'aviso-3',
+    title: 'Demonstração visual',
+    category: 'Entrega',
+    description:
+      'Inclua prints de todas as telas e um vídeo ou GIF demonstrando cadastro, login, uso do app e logout.',
+    date: '2026-03-14',
   },
 ];
-
-export default avisos;

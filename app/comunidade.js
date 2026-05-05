@@ -1,203 +1,185 @@
-import { useState } from 'react';
-import {
-  ScrollView,
-  View,
-  Text,
-  StyleSheet,
-  TextInput,
-  TouchableOpacity,
-} from 'react-native';
-import Header from '../components/Header';
-import PostCard from '../components/PostCard';
-import postsData from '../data/posts';
+import { router } from 'expo-router';
+import { useEffect, useState } from 'react';
+import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
+import FeedbackMessage from '../components/FeedbackMessage';
+import InputField from '../components/InputField';
+import PrimaryButton from '../components/PrimaryButton';
+import ScreenContainer from '../components/ScreenContainer';
+import colors from '../constants/colors';
+import { useAppData } from '../context/AppDataContext';
+import { useAuth } from '../context/AuthContext';
+import { validateRequired } from '../utils/validators';
 
 export default function ComunidadeScreen() {
-  const [posts, setPosts] = useState(postsData);
-  const [postSelecionado, setPostSelecionado] = useState(null);
-  const [comentario, setComentario] = useState('');
-  const [feedback, setFeedback] = useState(null);
+  const { user, loadingAuth } = useAuth();
+  const { comentarios, addComentario, loadingData } = useAppData();
 
-  function adicionarComentario() {
-    if (!postSelecionado) {
-      setFeedback({
-        tipo: 'erro',
-        texto: 'Selecione um post antes de comentar.',
-      });
+  const [message, setMessage] = useState('');
+  const [error, setError] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => {
+    if (!loadingAuth && !user) {
+      router.replace('/login');
+    }
+  }, [loadingAuth, user]);
+
+  async function handleSubmit() {
+    const validationError = validateRequired(message, 'O comentário não pode ficar vazio.');
+    setError(validationError);
+
+    if (validationError) {
       return;
     }
 
-    if (!comentario.trim()) {
-      setFeedback({
-        tipo: 'erro',
-        texto: 'Digite um comentário antes de enviar.',
+    try {
+      setSubmitting(true);
+
+      await addComentario({
+        author: user.name,
+        message,
       });
-      return;
+
+      setMessage('');
+      setSuccessMessage('Comentário publicado e salvo localmente.');
+    } finally {
+      setSubmitting(false);
     }
+  }
 
-    const novosPosts = posts.map((post) => {
-      if (post.id === postSelecionado) {
-        return {
-          ...post,
-          comentarios: post.comentarios + 1,
-          ultimoComentario: comentario,
-        };
-      }
-      return post;
-    });
-
-    setPosts(novosPosts);
-    setComentario('');
-    setFeedback({
-      tipo: 'sucesso',
-      texto: 'Comentário adicionado com sucesso.',
-    });
+  if (loadingAuth || loadingData || !user) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color={colors.primary} />
+        <Text style={styles.loadingText}>Carregando comunidade...</Text>
+      </View>
+    );
   }
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <Header
-        title="Comunidade"
-        subtitle="Espaço simples para acompanhar posts e interações entre os grupos."
-      />
+    <ScreenContainer>
+      <Text style={styles.title}>Comunidade</Text>
+      <Text style={styles.subtitle}>
+        Compartilhe dúvidas, avisos e ideias com os integrantes do Challenge.
+      </Text>
 
-      <View style={styles.commentPanel}>
-        <Text style={styles.panelTitle}>Novo comentário</Text>
-        <Text style={styles.panelSubtitle}>
-          Selecione um post abaixo e envie um comentário rápido.
-        </Text>
+      <View style={styles.card}>
+        <FeedbackMessage type="success" message={successMessage} />
 
-        <TextInput
-          style={styles.input}
-          placeholder="Digite seu comentário..."
-          value={comentario}
-          onChangeText={setComentario}
+        <InputField
+          label="Novo comentário"
+          value={message}
+          onChangeText={value => {
+            setMessage(value);
+            setError('');
+            setSuccessMessage('');
+          }}
+          placeholder="Digite sua mensagem para a comunidade"
+          multiline
+          error={error}
         />
 
-        <TouchableOpacity style={styles.button} onPress={adicionarComentario}>
-          <Text style={styles.buttonText}>Adicionar comentário</Text>
-        </TouchableOpacity>
+        <PrimaryButton
+          title="Publicar comentário"
+          onPress={handleSubmit}
+          loading={submitting}
+        />
       </View>
 
-      {feedback && (
-        <View
-          style={[
-            styles.feedbackBox,
-            feedback.tipo === 'erro' ? styles.feedbackError : styles.feedbackSuccess,
-          ]}
-        >
-          <Text style={styles.feedbackText}>{feedback.texto}</Text>
-        </View>
-      )}
+      <Text style={styles.sectionTitle}>Comentários</Text>
 
-      {posts.length === 0 ? (
-        <View style={styles.emptyBox}>
-          <Text style={styles.emptyTitle}>Nenhum post disponível</Text>
-          <Text style={styles.emptyText}>
-            A comunidade ainda não possui publicações.
-          </Text>
-        </View>
-      ) : (
-        posts.map((post) => (
-          <PostCard
-            key={post.id}
-            autor={post.autor}
-            titulo={post.titulo}
-            conteudo={post.conteudo}
-            comentarios={post.comentarios}
-            ultimoComentario={post.ultimoComentario}
-            selecionado={postSelecionado === post.id}
-            onSelect={() => setPostSelecionado(post.id)}
-          />
-        ))
-      )}
-    </ScrollView>
+      <View style={styles.list}>
+        {comentarios.map(item => (
+          <View style={styles.commentCard} key={item.id}>
+            <View style={styles.commentHeader}>
+              <Text style={styles.author}>{item.author}</Text>
+              <Text style={styles.date}>
+                {new Date(item.createdAt).toLocaleDateString('pt-BR')}
+              </Text>
+            </View>
+
+            <Text style={styles.commentText}>{item.message}</Text>
+          </View>
+        ))}
+      </View>
+
+      <View style={styles.backButton}>
+        <PrimaryButton title="Voltar para Home" onPress={() => router.push('/')} variant="outline" />
+      </View>
+    </ScreenContainer>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    padding: 20,
-    paddingBottom: 32,
-  },
-  commentPanel: {
-    backgroundColor: '#ffffff',
-    borderRadius: 16,
-    padding: 16,
-    marginBottom: 16,
-    borderWidth: 1,
-    borderColor: '#eeeeee',
-  },
-  panelTitle: {
-    fontSize: 18,
-    fontWeight: '800',
-    color: '#111111',
-    marginBottom: 6,
-  },
-  panelSubtitle: {
-    fontSize: 14,
-    color: '#555555',
-    lineHeight: 20,
-    marginBottom: 12,
-  },
-  input: {
-    backgroundColor: '#f7f7f7',
-    borderWidth: 1,
-    borderColor: '#dddddd',
-    borderRadius: 12,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-    fontSize: 14,
-    color: '#111111',
-    marginBottom: 12,
-  },
-  button: {
-    backgroundColor: '#ed145b',
-    paddingVertical: 13,
-    borderRadius: 12,
+  loadingContainer: {
+    flex: 1,
+    backgroundColor: colors.background,
     alignItems: 'center',
+    justifyContent: 'center',
+    gap: 12,
   },
-  buttonText: {
-    color: '#ffffff',
-    fontWeight: '700',
+  loadingText: {
+    color: colors.mutedText,
   },
-  feedbackBox: {
-    borderRadius: 12,
-    padding: 14,
-    marginBottom: 16,
-  },
-  feedbackSuccess: {
-    backgroundColor: '#e8f7ee',
-    borderWidth: 1,
-    borderColor: '#b7e4c7',
-  },
-  feedbackError: {
-    backgroundColor: '#fdecec',
-    borderWidth: 1,
-    borderColor: '#f3b0b0',
-  },
-  feedbackText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#222222',
-  },
-  emptyBox: {
-    backgroundColor: '#ffffff',
-    borderRadius: 16,
-    padding: 18,
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#eeeeee',
-  },
-  emptyTitle: {
-    fontSize: 17,
-    fontWeight: '700',
-    color: '#111111',
+  title: {
+    fontSize: 28,
+    fontWeight: '900',
+    color: colors.text,
     marginBottom: 8,
   },
-  emptyText: {
-    fontSize: 14,
-    color: '#666666',
-    textAlign: 'center',
-    lineHeight: 20,
+  subtitle: {
+    color: colors.mutedText,
+    fontSize: 15,
+    lineHeight: 22,
+    marginBottom: 20,
+  },
+  card: {
+    backgroundColor: colors.surface,
+    borderRadius: 20,
+    padding: 18,
+    borderWidth: 1,
+    borderColor: colors.border,
+    marginBottom: 24,
+  },
+  sectionTitle: {
+    color: colors.text,
+    fontSize: 20,
+    fontWeight: '900',
+    marginBottom: 12,
+  },
+  list: {
+    gap: 12,
+  },
+  commentCard: {
+    backgroundColor: colors.surface,
+    borderRadius: 18,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  commentHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    gap: 12,
+    marginBottom: 8,
+  },
+  author: {
+    color: colors.text,
+    fontWeight: '900',
+    fontSize: 15,
+    flex: 1,
+  },
+  date: {
+    color: colors.primary,
+    fontWeight: '800',
+    fontSize: 12,
+  },
+  commentText: {
+    color: colors.mutedText,
+    lineHeight: 21,
+  },
+  backButton: {
+    marginTop: 24,
   },
 });

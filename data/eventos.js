@@ -1,32 +1,23 @@
-const eventos = [
+export const INITIAL_EVENTOS = [
   {
-    id: 1,
-    data: '20/03/2026',
-    titulo: 'Início da Sprint 1',
-    descricao: 'Definição do problema e estrutura inicial do projeto.',
-    tipo: 'Sprint',
+    id: 'evento-1',
+    title: 'Início do desenvolvimento do CP2',
+    type: 'Planejamento',
+    date: '2026-03-10',
+    description: 'Divisão de tarefas, criação de branches e definição do diferencial técnico.',
   },
   {
-    id: 2,
-    data: '26/03/2026',
-    titulo: 'Mentoria com a empresa',
-    descricao: 'Momento para tirar dúvidas e alinhar a proposta do app.',
-    tipo: 'Mentoria',
+    id: 'evento-2',
+    title: 'Revisão de autenticação e persistência',
+    type: 'Revisão',
+    date: '2026-03-13',
+    description: 'Teste de cadastro, login, logout e sessão persistida com AsyncStorage.',
   },
   {
-    id: 3,
-    data: '02/04/2026',
-    titulo: 'Entrega parcial',
-    descricao: 'Envio do MVP funcional com as telas principais.',
-    tipo: 'Entrega',
-  },
-  {
-    id: 4,
-    data: '10/04/2026',
-    titulo: 'Apresentação final',
-    descricao: 'Demonstração do aplicativo para avaliação.',
-    tipo: 'Evento',
+    id: 'evento-3',
+    title: 'Entrega final do Checkpoint',
+    type: 'Entrega',
+    date: '2026-03-17',
+    description: 'Entrega do repositório público, README completo e demonstração visual.',
   },
 ];
-
-export default eventos;
