@@ -1,13 +1,10 @@
-import { TouchableOpacity, View, Text, StyleSheet } from 'react-native';
 import { router } from 'expo-router';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
+import colors from '../constants/colors';
 
-export default function MenuCard({ icon, title, description, route }) {
+export default function MenuCard({ title, description, icon, href }) {
   return (
-    <TouchableOpacity
-      activeOpacity={0.85}
-      style={styles.card}
-      onPress={() => router.push(route)}
-    >
+    <Pressable style={styles.card} onPress={() => router.push(href)}>
       <View style={styles.iconBox}>
         <Text style={styles.icon}>{icon}</Text>
       </View>
@@ -16,44 +13,44 @@ export default function MenuCard({ icon, title, description, route }) {
         <Text style={styles.title}>{title}</Text>
         <Text style={styles.description}>{description}</Text>
       </View>
-    </TouchableOpacity>
+    </Pressable>
   );
 }
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: '#ffffff',
-    borderRadius: 16,
+    backgroundColor: colors.surface,
+    borderRadius: 18,
     padding: 16,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 14,
     borderWidth: 1,
-    borderColor: '#eeeeee',
+    borderColor: colors.border,
+    flexDirection: 'row',
+    gap: 14,
+    alignItems: 'center',
   },
   iconBox: {
-    width: 52,
-    height: 52,
-    borderRadius: 14,
-    backgroundColor: '#fde7ef',
+    width: 46,
+    height: 46,
+    borderRadius: 16,
+    backgroundColor: '#fff0f5',
     alignItems: 'center',
     justifyContent: 'center',
   },
   icon: {
-    fontSize: 24,
+    fontSize: 22,
   },
   textBox: {
     flex: 1,
   },
   title: {
+    color: colors.text,
     fontSize: 17,
-    fontWeight: '700',
-    color: '#111111',
+    fontWeight: '900',
     marginBottom: 4,
   },
   description: {
+    color: colors.mutedText,
     fontSize: 14,
-    color: '#555555',
     lineHeight: 20,
   },
 });

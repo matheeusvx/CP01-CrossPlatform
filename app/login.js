@@ -7,9 +7,12 @@ import {
   Pressable,
   StyleSheet,
   Text,
-  TextInput,
   View,
 } from 'react-native';
+import FeedbackMessage from '../components/FeedbackMessage';
+import InputField from '../components/InputField';
+import PrimaryButton from '../components/PrimaryButton';
+import ScreenContainer from '../components/ScreenContainer';
 import colors from '../constants/colors';
 import { useAuth } from '../context/AuthContext';
 import { validateLoginForm } from '../utils/validators';
@@ -70,64 +73,59 @@ export default function LoginScreen() {
 
   return (
     <KeyboardAvoidingView
-      style={styles.container}
+      style={styles.keyboard}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
-      <View style={styles.card}>
-        <Text style={styles.title}>Challenge Hub FIAP</Text>
-        <Text style={styles.subtitle}>Entre para continuar usando o app.</Text>
+      <ScreenContainer contentStyle={styles.container}>
+        <View style={styles.card}>
+          <Text style={styles.title}>Challenge Hub FIAP</Text>
+          <Text style={styles.subtitle}>
+            Acesse sua conta para acompanhar avisos, calendário e comunidade.
+          </Text>
 
-        <View style={styles.field}>
-          <Text style={styles.label}>E-mail</Text>
-          <TextInput
-            style={[styles.input, errors.email && styles.inputError]}
+          <FeedbackMessage type="error" message={generalError} />
+
+          <InputField
+            label="E-mail"
             value={form.email}
             onChangeText={value => updateField('email', value)}
             placeholder="usuario@dominio.com"
             keyboardType="email-address"
             autoCapitalize="none"
+            error={errors.email}
           />
-          {errors.email ? <Text style={styles.error}>{errors.email}</Text> : null}
-        </View>
 
-        <View style={styles.field}>
-          <Text style={styles.label}>Senha</Text>
-          <TextInput
-            style={[styles.input, errors.password && styles.inputError]}
+          <InputField
+            label="Senha"
             value={form.password}
             onChangeText={value => updateField('password', value)}
-            placeholder="Sua senha"
+            placeholder="Digite sua senha"
             secureTextEntry
+            error={errors.password}
           />
-          {errors.password ? <Text style={styles.error}>{errors.password}</Text> : null}
+
+          <PrimaryButton
+            title="Entrar"
+            onPress={handleLogin}
+            loading={submitting}
+          />
+
+          <Pressable onPress={() => router.push('/cadastro')}>
+            <Text style={styles.link}>Ainda não tem conta? Cadastre-se</Text>
+          </Pressable>
         </View>
-
-        {generalError ? <Text style={styles.generalError}>{generalError}</Text> : null}
-
-        <Pressable
-          style={[styles.button, submitting && styles.buttonDisabled]}
-          onPress={handleLogin}
-          disabled={submitting}
-        >
-          <Text style={styles.buttonText}>
-            {submitting ? 'Entrando...' : 'Entrar'}
-          </Text>
-        </Pressable>
-
-        <Pressable onPress={() => router.push('/cadastro')}>
-          <Text style={styles.link}>Ainda não tem conta? Cadastre-se</Text>
-        </Pressable>
-      </View>
+      </ScreenContainer>
     </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  keyboard: {
     flex: 1,
     backgroundColor: colors.background,
+  },
+  container: {
     justifyContent: 'center',
-    padding: 20,
   },
   loadingContainer: {
     flex: 1,
@@ -138,79 +136,30 @@ const styles = StyleSheet.create({
   },
   loadingText: {
     color: colors.mutedText,
-    fontSize: 14,
   },
   card: {
     backgroundColor: colors.surface,
-    borderRadius: 20,
+    borderRadius: 24,
     padding: 24,
     borderWidth: 1,
     borderColor: colors.border,
   },
   title: {
-    fontSize: 28,
-    fontWeight: '800',
     color: colors.text,
+    fontSize: 28,
+    fontWeight: '900',
     marginBottom: 8,
   },
   subtitle: {
-    fontSize: 15,
     color: colors.mutedText,
-    marginBottom: 28,
-    lineHeight: 22,
-  },
-  field: {
-    marginBottom: 16,
-  },
-  label: {
-    fontSize: 14,
-    color: colors.text,
-    fontWeight: '700',
-    marginBottom: 6,
-  },
-  input: {
-    backgroundColor: colors.light,
-    borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: 12,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
     fontSize: 15,
-    color: colors.text,
-  },
-  inputError: {
-    borderColor: colors.danger,
-  },
-  error: {
-    color: colors.danger,
-    fontSize: 13,
-    marginTop: 6,
-  },
-  generalError: {
-    color: colors.danger,
-    fontSize: 14,
-    fontWeight: '700',
-    marginBottom: 14,
-  },
-  button: {
-    backgroundColor: colors.primary,
-    paddingVertical: 14,
-    borderRadius: 14,
-    alignItems: 'center',
-    marginTop: 4,
-  },
-  buttonDisabled: {
-    opacity: 0.7,
-  },
-  buttonText: {
-    color: colors.light,
-    fontSize: 16,
-    fontWeight: '800',
+    lineHeight: 22,
+    marginBottom: 22,
   },
   link: {
     color: colors.primary,
     fontSize: 14,
-    fontWeight: '700',
+    fontWeight: '800',
     textAlign: 'center',
     marginTop: 18,
   },

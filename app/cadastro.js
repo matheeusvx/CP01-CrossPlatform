@@ -4,12 +4,14 @@ import {
   KeyboardAvoidingView,
   Platform,
   Pressable,
-  ScrollView,
   StyleSheet,
   Text,
-  TextInput,
   View,
 } from 'react-native';
+import FeedbackMessage from '../components/FeedbackMessage';
+import InputField from '../components/InputField';
+import PrimaryButton from '../components/PrimaryButton';
+import ScreenContainer from '../components/ScreenContainer';
 import colors from '../constants/colors';
 import { useAuth } from '../context/AuthContext';
 import { validateRegisterForm } from '../utils/validators';
@@ -69,171 +71,100 @@ export default function CadastroScreen() {
 
   return (
     <KeyboardAvoidingView
-      style={styles.keyboardContainer}
+      style={styles.keyboard}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
-      <ScrollView
-        contentContainerStyle={styles.container}
-        keyboardShouldPersistTaps="handled"
-      >
+      <ScreenContainer contentStyle={styles.container}>
         <View style={styles.card}>
           <Text style={styles.title}>Criar conta</Text>
           <Text style={styles.subtitle}>
-            Cadastre seus dados para acessar o Challenge Hub FIAP.
+            Preencha seus dados para salvar sua sessão no aplicativo.
           </Text>
 
-          <View style={styles.field}>
-            <Text style={styles.label}>Nome completo</Text>
-            <TextInput
-              style={[styles.input, errors.name && styles.inputError]}
-              value={form.name}
-              onChangeText={value => updateField('name', value)}
-              placeholder="Seu nome completo"
-            />
-            {errors.name ? <Text style={styles.error}>{errors.name}</Text> : null}
-          </View>
+          <FeedbackMessage type="error" message={generalError} />
 
-          <View style={styles.field}>
-            <Text style={styles.label}>E-mail</Text>
-            <TextInput
-              style={[styles.input, errors.email && styles.inputError]}
-              value={form.email}
-              onChangeText={value => updateField('email', value)}
-              placeholder="usuario@dominio.com"
-              keyboardType="email-address"
-              autoCapitalize="none"
-            />
-            {errors.email ? <Text style={styles.error}>{errors.email}</Text> : null}
-          </View>
+          <InputField
+            label="Nome completo"
+            value={form.name}
+            onChangeText={value => updateField('name', value)}
+            placeholder="Seu nome completo"
+            error={errors.name}
+          />
 
-          <View style={styles.field}>
-            <Text style={styles.label}>Senha</Text>
-            <TextInput
-              style={[styles.input, errors.password && styles.inputError]}
-              value={form.password}
-              onChangeText={value => updateField('password', value)}
-              placeholder="Mínimo de 6 caracteres"
-              secureTextEntry
-            />
-            {errors.password ? <Text style={styles.error}>{errors.password}</Text> : null}
-          </View>
+          <InputField
+            label="E-mail"
+            value={form.email}
+            onChangeText={value => updateField('email', value)}
+            placeholder="usuario@dominio.com"
+            keyboardType="email-address"
+            autoCapitalize="none"
+            error={errors.email}
+          />
 
-          <View style={styles.field}>
-            <Text style={styles.label}>Confirmar senha</Text>
-            <TextInput
-              style={[styles.input, errors.confirmPassword && styles.inputError]}
-              value={form.confirmPassword}
-              onChangeText={value => updateField('confirmPassword', value)}
-              placeholder="Digite a senha novamente"
-              secureTextEntry
-            />
-            {errors.confirmPassword ? (
-              <Text style={styles.error}>{errors.confirmPassword}</Text>
-            ) : null}
-          </View>
+          <InputField
+            label="Senha"
+            value={form.password}
+            onChangeText={value => updateField('password', value)}
+            placeholder="Mínimo de 6 caracteres"
+            secureTextEntry
+            error={errors.password}
+          />
 
-          {generalError ? <Text style={styles.generalError}>{generalError}</Text> : null}
+          <InputField
+            label="Confirmar senha"
+            value={form.confirmPassword}
+            onChangeText={value => updateField('confirmPassword', value)}
+            placeholder="Repita sua senha"
+            secureTextEntry
+            error={errors.confirmPassword}
+          />
 
-          <Pressable
-            style={[styles.button, submitting && styles.buttonDisabled]}
+          <PrimaryButton
+            title="Cadastrar"
             onPress={handleRegister}
-            disabled={submitting}
-          >
-            <Text style={styles.buttonText}>
-              {submitting ? 'Cadastrando...' : 'Cadastrar'}
-            </Text>
-          </Pressable>
+            loading={submitting}
+          />
 
           <Pressable onPress={() => router.push('/login')}>
             <Text style={styles.link}>Já tenho conta</Text>
           </Pressable>
         </View>
-      </ScrollView>
+      </ScreenContainer>
     </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
-  keyboardContainer: {
+  keyboard: {
     flex: 1,
     backgroundColor: colors.background,
   },
   container: {
-    flexGrow: 1,
     justifyContent: 'center',
-    padding: 20,
   },
   card: {
     backgroundColor: colors.surface,
-    borderRadius: 20,
+    borderRadius: 24,
     padding: 24,
     borderWidth: 1,
     borderColor: colors.border,
   },
   title: {
-    fontSize: 28,
-    fontWeight: '800',
     color: colors.text,
+    fontSize: 28,
+    fontWeight: '900',
     marginBottom: 8,
   },
   subtitle: {
-    fontSize: 15,
     color: colors.mutedText,
-    marginBottom: 28,
-    lineHeight: 22,
-  },
-  field: {
-    marginBottom: 16,
-  },
-  label: {
-    fontSize: 14,
-    color: colors.text,
-    fontWeight: '700',
-    marginBottom: 6,
-  },
-  input: {
-    backgroundColor: colors.light,
-    borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: 12,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
     fontSize: 15,
-    color: colors.text,
-  },
-  inputError: {
-    borderColor: colors.danger,
-  },
-  error: {
-    color: colors.danger,
-    fontSize: 13,
-    marginTop: 6,
-  },
-  generalError: {
-    color: colors.danger,
-    fontSize: 14,
-    fontWeight: '700',
-    marginBottom: 14,
-  },
-  button: {
-    backgroundColor: colors.primary,
-    paddingVertical: 14,
-    borderRadius: 14,
-    alignItems: 'center',
-    marginTop: 4,
-  },
-  buttonDisabled: {
-    opacity: 0.7,
-  },
-  buttonText: {
-    color: colors.light,
-    fontSize: 16,
-    fontWeight: '800',
+    lineHeight: 22,
+    marginBottom: 22,
   },
   link: {
     color: colors.primary,
     fontSize: 14,
-    fontWeight: '700',
+    fontWeight: '800',
     textAlign: 'center',
     marginTop: 18,
   },
