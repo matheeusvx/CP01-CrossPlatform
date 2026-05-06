@@ -8,11 +8,11 @@ import SearchBar from '../components/SearchBar';
 import colors from '../constants/colors';
 import { useAppData } from '../context/AppDataContext';
 import { useAuth } from '../context/AuthContext';
-import { INITIAL_AVISOS } from '../data/avisos';
+import { INITIAL_EVENTOS } from '../data/eventos';
 
-export default function AvisosScreen() {
+export default function CalendarioScreen() {
   const { user, loadingAuth } = useAuth();
-  const { avisosLidos, toggleAvisoLido, loadingData } = useAppData();
+  const { eventosFavoritos, toggleEventoFavorito, loadingData } = useAppData();
   const [search, setSearch] = useState('');
 
   useEffect(() => {
@@ -21,19 +21,19 @@ export default function AvisosScreen() {
     }
   }, [loadingAuth, user]);
 
-  const filteredAvisos = useMemo(() => {
+  const filteredEventos = useMemo(() => {
     const normalizedSearch = search.trim().toLowerCase();
 
     if (!normalizedSearch) {
-      return INITIAL_AVISOS;
+      return INITIAL_EVENTOS;
     }
 
-    return INITIAL_AVISOS.filter(aviso => {
+    return INITIAL_EVENTOS.filter(evento => {
       const searchableContent = [
-        aviso.title,
-        aviso.category,
-        aviso.description,
-        aviso.date,
+        evento.title,
+        evento.type,
+        evento.description,
+        evento.date,
       ]
         .join(' ')
         .toLowerCase();
@@ -46,60 +46,66 @@ export default function AvisosScreen() {
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color={colors.primary} />
-        <Text style={styles.loadingText}>Carregando avisos...</Text>
+        <Text style={styles.loadingText}>Carregando calendário...</Text>
       </View>
     );
   }
 
   return (
     <ScreenContainer>
-      <Text style={styles.title}>Avisos</Text>
+      <Text style={styles.title}>Calendário</Text>
       <Text style={styles.subtitle}>
-        Consulte comunicados importantes e marque os itens já lidos. A busca funciona em tempo real.
+        Busque eventos por nome, tipo ou data e favorite os momentos importantes do projeto.
       </Text>
 
       <SearchBar
         value={search}
         onChangeText={setSearch}
-        placeholder="Buscar por título, categoria ou data..."
+        placeholder="Buscar evento, entrega ou revisão..."
       />
 
-      <View style={styles.statsBox}>
-        <Text style={styles.statsText}>
-          {avisosLidos.length} de {INITIAL_AVISOS.length} avisos marcados como lidos
-        </Text>
-      </View>
-
-      {filteredAvisos.length === 0 ? (
+      {filteredEventos.length === 0 ? (
         <EmptyState
-          title="Nenhum aviso encontrado"
-          description="Tente buscar por avaliação, documentação, entrega ou outra palavra-chave."
+          title="Nenhum evento encontrado"
+          description="Tente buscar por entrega, revisão, planejamento ou uma data específica."
         />
       ) : (
-        <View style={styles.list}>
-          {filteredAvisos.map(aviso => {
-            const isRead = avisosLidos.includes(aviso.id);
+        <View style={styles.timeline}>
+          {filteredEventos.map(evento => {
+            const isFavorite = eventosFavoritos.includes(evento.id);
 
             return (
-              <View style={[styles.card, isRead && styles.readCard]} key={aviso.id}>
-                <View style={styles.cardHeader}>
-                  <Text style={styles.category}>{aviso.category}</Text>
-                  <Text style={styles.date}>
-                    {new Date(aviso.date).toLocaleDateString('pt-BR')}
-                  </Text>
+              <View style={styles.eventCard} key={evento.id}>
+                <View style={styles.timelineDot} />
+
+                <View style={styles.eventContent}>
+                  <View style={styles.eventHeader}>
+                    <Text style={styles.type}>{evento.type}</Text>
+                    <Text style={styles.date}>
+                      {new Date(evento.date).toLocaleDateString('pt-BR')}
+                    </Text>
+                  </View>
+
+                  <Text style={styles.eventTitle}>{evento.title}</Text>
+                  <Text style={styles.eventDescription}>{evento.description}</Text>
+
+                  <Pressable
+                    style={[
+                      styles.favoriteButton,
+                      isFavorite && styles.favoriteButtonActive,
+                    ]}
+                    onPress={() => toggleEventoFavorito(evento.id)}
+                  >
+                    <Text
+                      style={[
+                        styles.favoriteButtonText,
+                        isFavorite && styles.favoriteButtonTextActive,
+                      ]}
+                    >
+                      {isFavorite ? '★ Favorito' : '☆ Favoritar'}
+                    </Text>
+                  </Pressable>
                 </View>
-
-                <Text style={styles.cardTitle}>{aviso.title}</Text>
-                <Text style={styles.cardDescription}>{aviso.description}</Text>
-
-                <Pressable
-                  style={[styles.readButton, isRead && styles.readButtonActive]}
-                  onPress={() => toggleAvisoLido(aviso.id)}
-                >
-                  <Text style={[styles.readButtonText, isRead && styles.readButtonTextActive]}>
-                    {isRead ? 'Lido' : 'Marcar como lido'}
-                  </Text>
-                </Pressable>
               </View>
             );
           })}
@@ -107,7 +113,11 @@ export default function AvisosScreen() {
       )}
 
       <View style={styles.backButton}>
-        <PrimaryButton title="Voltar para Home" onPress={() => router.push('/')} variant="outline" />
+        <PrimaryButton
+          title="Voltar para Home"
+          onPress={() => router.push('/')}
+          variant="outline"
+        />
       </View>
     </ScreenContainer>
   );
@@ -136,42 +146,37 @@ const styles = StyleSheet.create({
     lineHeight: 22,
     marginBottom: 18,
   },
-  statsBox: {
-    backgroundColor: '#fff0f5',
-    borderRadius: 16,
-    padding: 14,
-    marginBottom: 16,
-    borderWidth: 1,
-    borderColor: '#ffd1df',
-  },
-  statsText: {
-    color: colors.primary,
-    fontWeight: '900',
-    fontSize: 14,
-  },
-  list: {
+  timeline: {
     gap: 14,
   },
-  card: {
+  eventCard: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  timelineDot: {
+    width: 14,
+    height: 14,
+    borderRadius: 7,
+    backgroundColor: colors.primary,
+    marginTop: 22,
+  },
+  eventContent: {
+    flex: 1,
     backgroundColor: colors.surface,
     borderRadius: 18,
     padding: 16,
     borderWidth: 1,
     borderColor: colors.border,
   },
-  readCard: {
-    borderColor: colors.success,
-    backgroundColor: '#f3fbf5',
-  },
-  cardHeader: {
+  eventHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     gap: 10,
     marginBottom: 10,
   },
-  category: {
-    backgroundColor: colors.dark,
-    color: colors.light,
+  type: {
+    backgroundColor: '#fff0f5',
+    color: colors.primary,
     fontSize: 12,
     fontWeight: '900',
     paddingHorizontal: 10,
@@ -184,34 +189,33 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '700',
   },
-  cardTitle: {
+  eventTitle: {
     color: colors.text,
     fontSize: 18,
     fontWeight: '900',
     marginBottom: 8,
   },
-  cardDescription: {
+  eventDescription: {
     color: colors.mutedText,
     fontSize: 14,
     lineHeight: 21,
     marginBottom: 14,
   },
-  readButton: {
+  favoriteButton: {
     borderWidth: 1,
     borderColor: colors.primary,
     borderRadius: 12,
     paddingVertical: 10,
     alignItems: 'center',
   },
-  readButtonActive: {
-    backgroundColor: colors.success,
-    borderColor: colors.success,
+  favoriteButtonActive: {
+    backgroundColor: colors.primary,
   },
-  readButtonText: {
+  favoriteButtonText: {
     color: colors.primary,
     fontWeight: '900',
   },
-  readButtonTextActive: {
+  favoriteButtonTextActive: {
     color: colors.light,
   },
   backButton: {
